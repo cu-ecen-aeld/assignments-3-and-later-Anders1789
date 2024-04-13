@@ -1,5 +1,10 @@
 #include "systemcalls.h"
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/fcntl.h>
+
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -16,6 +21,10 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
+    int res = system(cmd);
+    if (res != 0) {
+        return false;
+    }
 
     return true;
 }
@@ -58,10 +67,31 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+    bool result = true;
 
+    pid_t pid = fork();
+    if (pid == -1) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+    else if (pid == 0) {
+        execv(command[0], command);
+        exit(EXIT_FAILURE);
+    }
+
+    int status;
+    if (wait(&status) == -1) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+    else if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+
+cleanup_and_exit:
     va_end(args);
-
-    return true;
+    return result;
 }
 
 /**
@@ -92,8 +122,42 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+    bool result = true;
+ 
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    if (fd == -1) {
+        result = false;
+        goto cleanup_and_exit;
+    }
 
+    pid_t pid = fork();
+    if (pid == -1) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+    else if (pid == 0) {
+        if (dup2(fd, 1) < 0) {
+            exit(EXIT_FAILURE);
+        }
+        execv(command[0], command);
+        exit(EXIT_FAILURE);
+    }
+
+    int status;
+    if (wait(&status) == -1) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+    else if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        result = false;
+        goto cleanup_and_exit;
+    }
+
+
+cleanup_and_exit:
+    if (fd != -1) {
+        close(fd);
+    }
     va_end(args);
-
-    return true;
+    return result;
 }
