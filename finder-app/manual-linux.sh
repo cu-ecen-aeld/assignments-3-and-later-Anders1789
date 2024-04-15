@@ -54,7 +54,7 @@ fi
 
 
 echo "Adding the Image in outdir"
-cp linux-stable/arch/arm64/boot/Image ${OUTDIR}
+cp ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
 
 echo "Creating the staging directory for the root filesystem"
 cd "$OUTDIR"
