@@ -68,10 +68,10 @@ echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
 echo ${OUTPUTSTRING} | grep "${MATCHSTR}" > ${OUTFILE}
 if [ $? -eq 0 ]; then
 	echo "success"
-	echo "success" > ${OUTFILE}
+	echo "success" >> ${OUTFILE}
 	exit 0
 else
 	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found"
-	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found" > ${OUTFILE}
+	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found" >> ${OUTFILE}
 	exit 1
 fi
