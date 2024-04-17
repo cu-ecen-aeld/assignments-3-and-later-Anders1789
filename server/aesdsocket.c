@@ -42,6 +42,8 @@ static int setup_server_socket() {
 
     // Create addrinfo struct according to specs
     memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     int status = getaddrinfo(NULL, "9000", &hints, &serv_info);
     if (status != 0) {
