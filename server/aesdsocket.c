@@ -58,16 +58,16 @@ static int setup_server_socket() {
         return -1;
     }
 
-    // Set SO_REUSEADDR to avoid "Already in use" errors when doing heavy testing.
-    const int enable = 1;
-    if (setsockopt(serv_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
-        perror("setsockopt error");
-        if(close(serv_fd)) {
-            perror("close serv error");
-        }
-        freeaddrinfo(serv_info);
-        return -1;
-    }
+//    // Set SO_REUSEADDR to avoid "Already in use" errors when doing heavy testing.
+//    const int enable = 1;
+//    if (setsockopt(serv_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
+//        perror("setsockopt error");
+//        if(close(serv_fd)) {
+//            perror("close serv error");
+//        }
+//        freeaddrinfo(serv_info);
+//        return -1;
+//    }
 
     // Bind socket to address using the rest of addrinfo 
     if (bind(serv_fd, serv_info->ai_addr, serv_info->ai_addrlen) == -1) {
